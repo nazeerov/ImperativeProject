@@ -20,7 +20,7 @@ class MainViewModel @Inject constructor(private val tvShowRepository: TVShowRepo
     val errorMessage=MutableLiveData<String>()
     val tvShowsFromApi = MutableLiveData<ArrayList<TVShow>?>()
 
-    val tvShowPopular = MutableLiveData<TVShowPopular>()
+    val tvShowPopular = MutableLiveData<TVShowPopular?>()
     val tvShowDetails = MutableLiveData<TVShowDetails?>()
 
     /**
@@ -34,6 +34,7 @@ class MainViewModel @Inject constructor(private val tvShowRepository: TVShowRepo
             withContext(Dispatchers.Main){
                 if (response.isSuccessful){
                     val resp = response.body()
+                    tvShowPopular.postValue(resp)
                     var localShows = tvShowsFromApi.value
                     if (localShows==null) localShows= ArrayList()
                     val serverShows = resp!!.tv_shows
@@ -61,8 +62,8 @@ class MainViewModel @Inject constructor(private val tvShowRepository: TVShowRepo
             val response = tvShowRepository.apiTVShowDetails(show_id)
             withContext(Dispatchers.Main) {
                 if (response.isSuccessful) {
-                    val reps = response.body()
-                    tvShowDetails.postValue(reps)
+                    val resp = response.body()
+                    tvShowDetails.postValue(resp)
                     isLoading.value = false
                 } else {
                     onError("Error : ${response.message()} ")
